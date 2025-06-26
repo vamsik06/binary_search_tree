@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RotateCcw, Sun, Moon } from "lucide-react";
 
@@ -22,12 +22,6 @@ function insertIntoBST(root: TreeNode | null, value: number): TreeNode {
     return { ...root, left: insertIntoBST(root.left, value) };
   }
   return { ...root, right: insertIntoBST(root.right, value) };
-}
-
-// Helper to get tree depth
-function getTreeDepth(node: TreeNode | null): number {
-  if (!node) return 0;
-  return 1 + Math.max(getTreeDepth(node.left), getTreeDepth(node.right));
 }
 
 // Updated calculatePositions to fit all nodes in the box
