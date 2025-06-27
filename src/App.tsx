@@ -225,10 +225,7 @@ export default function App() {
                 {/* Nodes */}
                 <AnimatePresence>
                   {[...positions.entries()].map(([id, pos]) => {
-                    let nodeColor = "bg-orange-400";
-                    if (pos.level === 0) nodeColor = "bg-blue-600";
-                    else if (pos.level === 1) nodeColor = "bg-green-600";
-                    // else keep orange for level 2+
+                    const nodeColor = "bg-blue-600"; // All nodes are blue now
                     return (
                       <motion.div
                         key={id}
