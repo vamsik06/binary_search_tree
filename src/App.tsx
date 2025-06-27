@@ -114,23 +114,33 @@ function renderLines(node: TreeNode | null, positions: Map<number, NodePosition>
 export default function App() {
   const [tree, setTree] = useState<TreeNode | null>(null);
   const [usedValues, setUsedValues] = useState<number[]>([]);
-  const [theme, setTheme] = useState("light");
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [treeOffset, setTreeOffset] = useState(0); // Store the offset
   const predefinedValues = [10, 20, 30, 40, 50, 60, 70];
   const canvasWidth = 520;
   const canvasHeight = 480;
 
-  // sync <html> class for Tailwind dark‑mode utilities
+  // Apply dark mode styles
   useEffect(() => {
     const root = document.documentElement;
-    console.log("Theme effect, theme is:", theme);
-    if (theme === "dark") {
-      root.classList.add("dark");
+    if (isDarkMode) {
+      root.style.setProperty('--bg-primary', '#111827');
+      root.style.setProperty('--bg-secondary', '#1f2937');
+      root.style.setProperty('--bg-tertiary', '#374151');
+      root.style.setProperty('--text-primary', '#f9fafb');
+      root.style.setProperty('--text-secondary', '#d1d5db');
+      root.style.setProperty('--border-color', '#4b5563');
+      root.style.setProperty('--canvas-bg', '#111827');
     } else {
-      root.classList.remove("dark");
+      root.style.setProperty('--bg-primary', '#f9fafb');
+      root.style.setProperty('--bg-secondary', '#ffffff');
+      root.style.setProperty('--bg-tertiary', '#f3f4f6');
+      root.style.setProperty('--text-primary', '#111827');
+      root.style.setProperty('--text-secondary', '#6b7280');
+      root.style.setProperty('--border-color', '#d1d5db');
+      root.style.setProperty('--canvas-bg', '#ffffff');
     }
-    console.log("HTML classList:", root.classList);
-  }, [theme]);
+  }, [isDarkMode]);
 
   const positions = useMemo(() => calculatePositions(tree), [tree]);
 
@@ -159,18 +169,23 @@ export default function App() {
   };
 
   const toggleTheme = () => {
-    setTheme(prev => {
-      const newTheme = prev === "light" ? "dark" : "light";
-      console.log("Toggling theme to:", newTheme);
-      return newTheme;
-    });
+    setIsDarkMode(prev => !prev);
   };
 
   /* ------------------------------ Render ------------------------------- */
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div 
+      className="min-h-screen transition-colors duration-200"
+      style={{ backgroundColor: 'var(--bg-primary)' }}
+    >
       <main className="min-h-screen flex items-center justify-center px-4 py-4">
-        <div className="w-full min-w-[580px] h-[600px] p-4 rounded-lg border bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 transition-colors duration-200">
+        <div 
+          className="w-full min-w-[580px] h-[600px] p-4 rounded-lg border transition-colors duration-200"
+          style={{ 
+            backgroundColor: 'var(--bg-secondary)',
+            borderColor: 'var(--border-color)'
+          }}
+        >
           {/* Controls */}
           <div className="flex flex-wrap gap-2 justify-between items-center mb-4 h-16">
             <div className="flex flex-wrap gap-2">
@@ -181,9 +196,17 @@ export default function App() {
                   disabled={usedValues.includes(value)}
                   className={`px-3 py-1 rounded font-medium transition-colors ${
                     usedValues.includes(value)
-                      ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600'
+                      ? 'cursor-not-allowed'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
                   }`}
+                  style={{
+                    backgroundColor: usedValues.includes(value) 
+                      ? 'var(--bg-tertiary)' 
+                      : undefined,
+                    color: usedValues.includes(value) 
+                      ? 'var(--text-secondary)' 
+                      : undefined
+                  }}
                 >
                   {value}
                 </button>
@@ -193,24 +216,43 @@ export default function App() {
             <div className="flex gap-2">
               <button 
                 onClick={resetTree} 
-                className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                className="px-3 py-1 border rounded flex items-center gap-1 hover:bg-gray-100 transition-colors"
+                style={{
+                  backgroundColor: 'var(--bg-secondary)',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-primary)'
+                }}
               >
                 <RotateCcw className="w-4 h-4" /> Reset
               </button>
 
               <button 
                 onClick={toggleTheme} 
-                className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                className="px-3 py-1 border rounded flex items-center gap-1 hover:bg-gray-100 transition-colors"
+                style={{
+                  backgroundColor: 'var(--bg-secondary)',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-primary)'
+                }}
               >
-                {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
           {/* Canvas */}
-          <div className="relative w-full max-h-[480px] h-[480px] bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-y-auto flex items-center justify-center">
+          <div 
+            className="relative w-full max-h-[480px] h-[480px] rounded-lg border overflow-y-auto flex items-center justify-center transition-colors duration-200"
+            style={{
+              backgroundColor: 'var(--canvas-bg)',
+              borderColor: 'var(--border-color)'
+            }}
+          >
             {!tree ? (
-              <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-300">
+              <div 
+                className="flex items-center justify-center h-full"
+                style={{ color: 'var(--text-secondary)' }}
+              >
                 Click a number to build your BST
               </div>
             ) : (
@@ -225,11 +267,10 @@ export default function App() {
                 {/* Nodes */}
                 <AnimatePresence>
                   {[...positions.entries()].map(([id, pos]) => {
-                    const nodeColor = "bg-blue-600"; // All nodes are blue now
                     return (
                       <motion.div
                         key={id}
-                        className={`absolute w-10 h-10 ${nodeColor} text-white rounded-full flex items-center justify-center font-bold text-base shadow-lg border-2 border-white`}
+                        className="absolute w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-base shadow-lg border-2 border-white"
                         style={{ left: pos.x + treeOffset - 20, top: pos.y - 20 }}
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
